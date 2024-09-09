@@ -26,8 +26,9 @@ const pageComponents = computed(() => {
 
 <template>
   <div :class="$route.name">
+    <SectionCreateVoldApp />
     <SectionsWrapper :components="pageComponents" />
-    <SectionForm />
+    <!-- <SectionForm /> -->
   </div>
 </template>
 
