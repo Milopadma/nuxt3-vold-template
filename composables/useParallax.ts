@@ -1,5 +1,6 @@
 import gsap from 'gsap';
 import ScrollTrigger from 'gsap/ScrollTrigger';
+import { Ref, ref, onMounted, onUnmounted, watch } from 'vue';
 
 if (import.meta.client) {
   gsap.registerPlugin(ScrollTrigger);

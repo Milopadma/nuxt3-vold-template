@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { WellnessSection } from '~/types/cms';
+import type { WellnessSection } from '~/types/common';
 
 const elImg = ref<HTMLElement | null>(null);
 

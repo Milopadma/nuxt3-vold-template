@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import gsap from 'gsap';
-import type { SustainabilitySection } from '~/types/cms';
+import type { SustainabilitySection } from '~/types/common';
 
 const props = defineProps<{
   data: SustainabilitySection;

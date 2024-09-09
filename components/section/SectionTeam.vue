@@ -76,7 +76,7 @@
 
 <script setup lang="ts">
 import gsap from 'gsap';
-import type { TeamSection } from '~/types/cms';
+import type { TeamSection } from '~/types/common';
 
 const props = defineProps<{
   data: TeamSection;
@@ -141,7 +141,7 @@ const handleWheel = (e: any) => {
   updateScroll();
 };
 
-const eventKeyboard = () => {
+const eventKeyboard = (event: KeyboardEvent) => {
   if (event.key === 'Escape') {
     if (isDrawerOpen.value) {
       isDrawerOpen.value = false;
@@ -253,6 +253,7 @@ onUnmounted(() => {
   grid-template-columns: repeat(4, 1fr);
   gap: fn.toVw(var.$grid-gap);
   row-gap: fn.toVw(72);
+  align-items: flex-start;
 
   @include mx.mobile {
     grid-template-columns: repeat(1, 1fr);
@@ -316,6 +317,7 @@ onUnmounted(() => {
 
   .role {
     @extend .font-body3;
+    max-width: fn.toVw(277);
     opacity: 0.5;
   }
 }
@@ -370,7 +372,7 @@ onUnmounted(() => {
   position: absolute;
   z-index: 1;
   top: 50%;
-  right: 30%;
+  right: 33%;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -380,7 +382,7 @@ onUnmounted(() => {
   backdrop-filter: blur(10px);
   border-radius: 50%;
   color: var.$color-white;
-  transform: translate(825%, -50%);
+  transform: translate(900%, -50%);
   transition:
     background-color 0.3s ease,
     transform var.$transition-default;
@@ -424,7 +426,7 @@ onUnmounted(() => {
 }
 
 .drawer-content {
-  width: fn.toVw(444);
+  width: fn.toVw(490);
   padding: fn.toVw(74) fn.toVw(64) 0 fn.toVw(64);
   padding-bottom: 0;
   display: flex;

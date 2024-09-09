@@ -1,5 +1,8 @@
 <template>
-  <header id="header" ref="el" :class="{ active: headerActive, 'is--open': isOpen }">
+  <header
+    id="header"
+    ref="el"
+    :class="{ 'is--hidden': isHeaderHidden, active: headerActive, 'is--open': isOpen, 'is--text': route.path === '/privacy-terms' }">
     <nav class="nav font-button3">
       <NuxtLink class="logo" to="/">
         <IconLogo />
@@ -14,7 +17,7 @@
 
       <div class="hamburger-wrapper">
         <!-- Phase 2 -->
-        <div class="btn font-button3" @click="scrollToForm()">
+        <div class="btn font-button3" @click="route.name !== 'press-slug' ? scrollToForm() : scrollToForm(true)">
           <span>Join Us</span>
           <svg class="icon" width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path
@@ -66,34 +69,46 @@
           <div class="content">
             <p class="subtitle subtitle-top">Discover Pages</p>
             <ul class="menu">
-              <li v-for="(item, index) in menuItems.main" :key="index">
+              <li v-for="(item, index) in menuItems.mainMobile" :key="index">
                 <ButtonLink :text="item.name" :href="item.path" :class="{ active: item.path === route.path }" />
               </li>
               <li>
-                <ButtonLink href="/" text="Join Us" @click.prevent="scrollToForm()" />
+                <ButtonLink text="Join Us" @click.prevent="route.name !== 'press-slug' ? scrollToForm() : scrollToForm(true)" />
               </li>
             </ul>
 
             <div class="contact">
               <div class="item">
-                <p class="subtitle">Email Address :</p>
-                <a class="link" href="mailto:info@elementis.co">info@elementis.co</a>
-              </div>
-
-              <div class="item">
-                <p class="subtitle">Phone :</p>
+                <p class="subtitle">CONTACT US :</p>
+                <a class="link" href="mailto:info@elementis.co">info@ELEMENTIS.co</a>
+                <span class="spacer"> | </span>
                 <a class="link" href="tel:+62 823 4078 1817">+62 823 4078 1817</a>
               </div>
 
+              <!-- <div class="item">
+                <p class="subtitle">Phone :</p>
+                <a class="link" href="tel:+62 823 4078 1817">+62 823 4078 1817</a>
+              </div> -->
+
               <div class="item">
-                <p class="subtitle">Social Media :</p>
+                <p class="subtitle">Stay Connected :</p>
                 <ul class="socmed-list">
                   <li>
-                    <NuxtLink to="/" target="_blank" external>
+                    <NuxtLink to="https://www.instagram.com/elementis.co/" target="_blank" external>
                       <IconInstagram />
                     </NuxtLink>
                   </li>
                   <li>
+                    <NuxtLink to="https://www.facebook.com/share/Qfswyjm8Uz44otYs/?mibextid=LQQJ4d" target="_blank" external>
+                      <IconFacebook />
+                    </NuxtLink>
+                  </li>
+                  <li>
+                    <NuxtLink to="https://wa.me/6282340781817" target="_blank" external>
+                      <IconWhatsapp />
+                    </NuxtLink>
+                  </li>
+                  <!-- <li>
                     <NuxtLink to="/" target="_blank" external>
                       <IconPinterest />
                     </NuxtLink>
@@ -112,7 +127,7 @@
                     <NuxtLink to="/" target="_blank" external>
                       <IconLinkedin />
                     </NuxtLink>
-                  </li>
+                  </li> -->
                 </ul>
               </div>
             </div>
@@ -135,6 +150,7 @@ if (import.meta.client) {
 const el = ref();
 const elPopup = ref();
 const isOpen = ref(false);
+const isHeaderHidden = useHeaderHidden();
 const route = useRoute();
 const router = useRouter();
 
@@ -178,21 +194,37 @@ watch(router.currentRoute, () => {
   isOpen.value = false;
 });
 
-const scrollToForm = () => {
+const scrollToForm = (redirect) => {
   if (isOpen.value) {
     isOpen.value = false;
   }
 
-  nextTick(() =>
-    lenis.lenis.scrollTo('.form-section', {
-      duration: 1,
-      force: true,
-      offset: useDevice().isMobile ? 430 : 0,
-    }),
-  );
+  nextTick(() => {
+    if (redirect) {
+      router.push('/#joinus');
+    } else {
+      lenis.lenis.scrollTo('#joinus', {
+        duration: 1,
+        force: true,
+        offset: useDevice().isMobile ? 430 : 0,
+      });
+    }
+  });
 };
 
 onMounted(() => {
+  lenis.lenis.on('scroll', (e) => {
+    if (!el.value) return;
+    if (e.isLocked) return;
+
+    if (e.actualScroll <= 130) return;
+    if (e.direction === 1) {
+      isHeaderHidden.value = true;
+    } else if (e.direction === -1) {
+      isHeaderHidden.value = false;
+    }
+  });
+
   ScrollTrigger.create({
     trigger: document.body,
     start: `${window.innerHeight - 300}px`,
@@ -220,12 +252,16 @@ onUnmounted(() => {
   z-index: 9999;
   color: var.$color-white;
   transition:
-    background-color 0.6s var.$transition-ease,
-    color 0.6s var.$transition-ease,
-    transform 1s var.$transition-ease;
+    background-color 0.6s var.$transition-ease 0.1s,
+    color 0.6s var.$transition-ease 0.1s,
+    transform 0.8s var.$transition-ease;
 
   &.is--hidden {
     transform: translate3d(0, -120%, 0);
+  }
+
+  &.is--text {
+    color: var.$color-text;
   }
 
   &.active {
@@ -245,10 +281,6 @@ onUnmounted(() => {
         width: 100%;
         max-width: fn.toVw(215);
 
-        &:deep(path) {
-          fill: var.$color-primary;
-        }
-
         @include mx.mobile {
           max-width: fn.toVw(152);
         }
@@ -257,18 +289,6 @@ onUnmounted(() => {
       .hamburger-wrapper {
         .btn {
           border-color: rgba($color: var.$color-primary, $alpha: 0.5);
-
-          .icon {
-            path {
-              fill: var.$color-primary;
-            }
-          }
-        }
-      }
-
-      .hamburger {
-        .line {
-          background-color: var.$color-primary;
         }
       }
     }
@@ -337,7 +357,7 @@ onUnmounted(() => {
   justify-content: space-between;
   position: relative;
   padding: fn.toVw(33) fn.toVw(var.$container);
-  transition: padding 0.6s var.$transition-ease;
+  transition: padding 0.6s var.$transition-ease 0.1s;
 
   @include mx.mobile {
     padding: fn.toVw(40) fn.toVw(20);
@@ -360,6 +380,7 @@ onUnmounted(() => {
       height: auto;
 
       path {
+        fill: currentcolor;
         transition: fill 0.3s var.$transition-ease;
       }
     }
@@ -450,6 +471,7 @@ onUnmounted(() => {
         height: auto;
 
         path {
+          fill: currentcolor;
           transition: fill 0.3s var.$transition-ease;
         }
       }
@@ -479,7 +501,7 @@ onUnmounted(() => {
     .line {
       width: 100%;
       height: 1px;
-      background-color: var.$color-white;
+      background-color: currentcolor;
       transform-origin: right;
       transition: background-color 0.3s var.$transition-ease 0s;
 
@@ -595,8 +617,7 @@ onUnmounted(() => {
 
     .subtitle {
       color: var.$color-primary;
-      font-size: fn.toVw(14);
-      opacity: 0.5;
+      font-size: fn.toVw(16);
     }
 
     .menu {
@@ -640,10 +661,18 @@ onUnmounted(() => {
       padding: fn.toVw(20);
 
       .item {
-        display: flex;
-        flex-direction: column;
-        flex-wrap: wrap;
-        gap: calc(100svh * 20 / var(--basesvh));
+        width: 100%;
+
+        a {
+          display: inline-block;
+          margin-top: calc(100svh * 24 / var(--basesvh));
+        }
+
+        .spacer {
+          display: inline-block;
+          margin-left: fn.toVw(20);
+          margin-right: fn.toVw(20);
+        }
       }
 
       .socmed-list {
@@ -652,7 +681,8 @@ onUnmounted(() => {
 
         &:deep(svg) {
           width: auto;
-          height: fn.toVw(20);
+          height: 100%;
+          max-height: fn.toVw(20);
 
           path {
             fill: var.$color-primary;

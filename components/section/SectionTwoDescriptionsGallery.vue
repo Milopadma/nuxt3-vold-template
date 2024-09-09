@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { TwoDescriptionsGallerySection } from '~/types/cms';
+import type { TwoDescriptionsGallerySection } from '~/types/common';
 
 const elImg = ref<HTMLElement | null>(null);
 
@@ -11,7 +11,7 @@ const sectionDescription = useHighlightedText(() => props.data.TwoDescriptionsGa
 </script>
 
 <template>
-  <section class="page">
+  <section id="innovation-culture" class="page">
     <div class="homepage-grid">
       <div class="section-title">
         <TextLabel :text="props.data.TwoDescriptionsGallerySectionTitle" />

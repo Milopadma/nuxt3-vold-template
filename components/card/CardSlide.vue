@@ -63,11 +63,9 @@ const props = defineProps({
 
   .title {
     width: 100%;
-    max-width: fn.toVw(316);
     margin-bottom: fn.toVw(20);
 
     @include mx.mobile {
-      max-width: fn.toVw(308);
       margin-bottom: fn.toVw(18);
     }
   }

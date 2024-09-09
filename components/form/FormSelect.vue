@@ -5,7 +5,7 @@
     <div class="input-wrapper">
       <select :id="`input-${props.name}`" v-model="model" class="input font-body3" :name="`input-${props.name}`" :required="props.required">
         <option value="" disabled selected>{{ props.placeholder }}</option>
-        <option v-for="item in props.items" :key="item.code" :value="item.name">{{ item.name }}</option>
+        <option v-for="item in props.items" :key="item.code" :value="item.code">{{ item.name }}</option>
       </select>
 
       <div class="arrow">

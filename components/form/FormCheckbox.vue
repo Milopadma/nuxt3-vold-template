@@ -9,12 +9,15 @@
         type="checkbox"
         :placeholder="props.placeholder"
         :value="props.label"
-        :checked="props.checked" />
+        :checked="props.checked"
+        :required="props.required" />
       <svg class="checkmark" width="9" height="6" viewBox="0 0 9 6" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M0.888916 2.2223L3.61114 4.94453L7.88892 0.666748" stroke="#D1CCBF" stroke-width="1.5" />
       </svg>
     </div>
-    <label v-if="props.label" class="label font-caption1" :for="`input-${props.name}`">{{ props.label }}</label>
+    <label v-if="props.label" class="label font-caption1" :for="`input-${props.name}`"
+      >{{ props.label }} <NuxtLink v-if="props.policy" class="link active" to="/privacy-terms">Policies and Terms</NuxtLink></label
+    >
   </div>
 </template>
 
@@ -33,7 +36,15 @@ const props = defineProps({
     type: String,
     default: 'Input',
   },
+  required: {
+    type: Boolean,
+    default: false,
+  },
   checked: {
+    type: Boolean,
+    default: false,
+  },
+  policy: {
     type: Boolean,
     default: false,
   },
@@ -52,7 +63,7 @@ const model = defineModel({ type: Boolean });
 
   .label {
     color: var.$color-primary;
-    font-size: fn.toVw(15);
+    font-size: fn.toVw(16);
     cursor: pointer;
   }
 

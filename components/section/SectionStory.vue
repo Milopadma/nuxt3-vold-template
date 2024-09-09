@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { StorySection } from '~/types/cms';
+import type { StorySection } from '~/types/common';
 
 const props = defineProps<{
   data: StorySection;

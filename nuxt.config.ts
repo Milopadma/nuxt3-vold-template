@@ -56,10 +56,13 @@ export default defineNuxtConfig({
   //runtime
   runtimeConfig: {
     public: {
-      tokenId: '668cd748118e3e2550dbcdf9',
-      apiUrl: 'https://vold-api.dev.fleava.com/v1',
+      tokenId: 'client_id_replace_me',
+      apiUrl: 'https://create-vold-app-endpoint-example-production.up.railway.app/v1',
       awsUrl: 'https://vold-independent.s3.ap-southeast-1.amazonaws.com',
+      recaptchaSiteKey: '6LfYGjAqAAAAACxbAOuy-Lk6FpznHjBJATFzH4ES',
     },
+    mailchimpKey: '',
+    recaptchaKey: '',
   },
 
   build: {
@@ -70,7 +73,12 @@ export default defineNuxtConfig({
   css: ['~/assets/styles/app.scss'],
 
   // modules
-  modules: ['@nuxt/devtools', '@pinia/nuxt', '@nuxt/image', '@nuxtjs/device', '@nuxt/content'],
+  modules: ['@nuxt/devtools', '@pinia/nuxt', '@nuxt/image', '@nuxtjs/device', '@nuxt/content', 'nuxt-gtag'],
+
+  gtag: {
+    enabled: process.env.NODE_ENV === 'production',
+    id: 'G-1PTB7MLC83',
+  },
 
   image: {
     quality: 95,

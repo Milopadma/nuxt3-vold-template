@@ -42,17 +42,78 @@ const isReverse = ref(props.reverse);
 
 let ctx: gsap.Context | null = null;
 let roll1: gsap.core.Timeline | null = null;
+let onscroll: gsap.core | null = null;
 let scrollTriggerInstance: ScrollTrigger | null = null;
+let clones: HTMLElement[] = [];
+
+const cleanupMarquee = () => {
+  if (roll1) {
+    roll1.kill(); // Kill the timeline
+    roll1 = null;
+  }
+  if (onscroll) {
+    onscroll.kill(); // Kill the gsap
+    onscroll = null;
+  }
+  if (scrollTriggerInstance) {
+    scrollTriggerInstance.kill(); // Kill the ScrollTrigger instance
+    scrollTriggerInstance = null;
+  }
+  if (ctx) {
+    ctx.revert(); // Revert the context to clean up all animations created within it
+    ctx = null;
+  }
+
+  // Remove cloned elements
+  clones.forEach((clone) => {
+    clone.remove();
+  });
+  clones = []; // Clear the clones array
+};
 
 const setupMarquee = () => {
   if (!el.value || !import.meta.client) return;
 
-  if (ctx) {
-    ctx.revert();
-  }
+  // Always cleanup before setting up
+  cleanupMarquee();
 
   ctx = gsap.context(() => {
-    gsap.to('.marquee__wrapper', {
+    let direction = isReverse.value ? -1 : 1;
+
+    roll1 = gsap.timeline({
+      repeat: -1,
+      onReverseComplete() {
+        this.totalTime(this.rawTime() + this.duration() * 10);
+      },
+    });
+
+    const elements = gsap.utils.toArray('.marquee__group') as HTMLElement[];
+    clones = elements.map((el) => {
+      const clone = el.cloneNode(true) as HTMLElement;
+      el.parentNode?.appendChild(clone);
+      return clone;
+    });
+
+    elements.forEach((el, i) => {
+      gsap.set(clones[i], {
+        position: 'absolute',
+        overwrite: false,
+        top: el.offsetTop,
+        left: el.offsetLeft + (isReverse.value ? -el.offsetWidth : el.offsetWidth),
+      });
+
+      roll1!.to(
+        [el, clones[i]],
+        {
+          xPercent: isReverse.value ? 100 : -100,
+          duration: calcDuration.value,
+          ease: 'none',
+        },
+        0,
+      );
+    });
+
+    onscroll = gsap.to('.marquee__wrapper', {
       x: isReverse.value ? `+=${props.scrollSpeed}%` : `-=${props.scrollSpeed}%`,
       ease: 'none',
       duration: 2,
@@ -64,86 +125,40 @@ const setupMarquee = () => {
       },
     });
 
-    const roll = (targets: string, vars: gsap.TweenVars, reverse: boolean) => {
-      vars = { ease: 'none', ...vars };
-      const tl = gsap.timeline({
-        repeat: -1,
-        onReverseComplete() {
-          this.totalTime(this.rawTime() + this.duration() * 10);
-        },
-      });
-      const elements = gsap.utils.toArray(targets) as HTMLElement[];
-      const clones = elements.map((el) => {
-        const clone = el.cloneNode(true) as HTMLElement;
-        el.parentNode?.appendChild(clone);
-        return clone;
-      });
-      const positionClones = () =>
-        elements.forEach((el, i) =>
-          gsap.set(clones[i], {
-            position: 'absolute',
-            overwrite: false,
-            top: el.offsetTop,
-            left: el.offsetLeft + (reverse ? -el.offsetWidth : el.offsetWidth),
-          }),
-        );
-
-      positionClones();
-      elements.forEach((el, i) =>
-        tl.to(
-          [el, clones[i]],
-          {
-            xPercent: reverse ? 100 : -100,
-            ...vars,
-          },
-          0,
-        ),
-      );
-
-      return tl;
-    };
-
-    let direction = isReverse.value ? -1 : 1;
-
-    roll1 = roll(
-      '.marquee__group',
-      {
-        duration: calcDuration.value,
-      },
-      isReverse.value,
-    );
-
     scrollTriggerInstance = ScrollTrigger.create({
       trigger: el.value,
       start: 'top bottom',
       end: 'bottom top',
+      scrub: true,
       onUpdate(self) {
-        if (self.direction !== direction) {
-          direction *= -1;
-          gsap.to(roll1, { timeScale: direction, overwrite: true });
+        const newDirection = self.direction === -1 ? -1 : 1;
+
+        if (newDirection !== direction) {
+          direction = newDirection;
+          roll1!.timeScale(direction);
         }
       },
     });
   }, el.value);
 };
 
+const reinitMarquee = () => {
+  if (el.value) {
+    cleanupMarquee();
+    setupMarquee();
+  }
+};
+
+const throttledReinitMarquee = debounce(reinitMarquee);
+
 onMounted(() => {
   setupMarquee();
+  window.addEventListener('resize', throttledReinitMarquee);
 });
 
 onUnmounted(() => {
-  if (ctx) {
-    ctx.revert();
-    ctx = null;
-  }
-  if (roll1) {
-    roll1.kill();
-    roll1 = null;
-  }
-  if (scrollTriggerInstance) {
-    scrollTriggerInstance.kill();
-    scrollTriggerInstance = null;
-  }
+  cleanupMarquee();
+  window.removeEventListener('resize', throttledReinitMarquee);
 });
 </script>
 
@@ -152,6 +167,7 @@ onUnmounted(() => {
   padding: 0;
   text-transform: none;
   overflow: hidden;
+  position: relative;
 
   @include mx.mobile {
     font-size: 100px;
@@ -163,6 +179,7 @@ onUnmounted(() => {
   user-select: none;
   height: auto;
   white-space: nowrap;
+  position: relative;
 }
 
 .marquee__group {

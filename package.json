@@ -1,8 +1,7 @@
 {
-  "name": "create-vold-app",
+  "name": "elementis",
   "version": "1.0",
-  "author": "milopadma",
-  "type": "module",
+  "author": "reksaandhika",
   "scripts": {
     "dev": "nuxt dev --host",
     "start": "node .output/server/index.mjs",
@@ -20,10 +19,12 @@
     "@nuxtjs/device": "^3.1.1",
     "@pinia/nuxt": "^0.5.1",
     "@types/lodash": "^4.17.6",
+    "@types/mailchimp__mailchimp_marketing": "^3.0.20",
     "eslint": "^8.55.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.0.1",
     "nuxt": "^3.12.3",
+    "nuxt-gtag": "^3.0.1",
     "pinia": "^2.1.7",
     "prettier": "^3.1.0",
     "sass": "^1.69.5",
@@ -31,10 +32,12 @@
     "vue-tsc": "^1.8.25"
   },
   "dependencies": {
+    "@mailchimp/mailchimp_marketing": "^3.0.80",
     "gsap": "npm:@gsap/shockingly@^3.12.5",
     "lenis": "^1.1.5",
     "lodash": "^4.17.21",
-    "swiper": "^11.1.4"
+    "swiper": "^11.1.4",
+    "vue-recaptcha-v3": "^2.0.1"
   },
   "optionalDependencies": {
     "@rollup/rollup-linux-x64-gnu": "4.9.5"

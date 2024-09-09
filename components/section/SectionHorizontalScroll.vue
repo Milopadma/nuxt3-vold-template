@@ -1,5 +1,18 @@
 <template>
-  <section ref="el" class="innovation">
+  <section
+    ref="el"
+    class="innovation"
+    :class="{ 'is--links': isHaveLinks }"
+    @mouseenter="isHaveLinks ? (cursorDiscover = true) : null"
+    @mouseleave="isHaveLinks ? (cursorDiscover = false) : null"
+    @click="isHaveLinks ? $router.push('/innovation') : null">
+    <!-- TODO: improve this later, because browser mouseleave bug -->
+    <!-- <div v-if="isHaveLinks" class="link-wrapper">
+      <div v-for="(slide, index) in slides" :key="index" class="link-inner" :class="{ 'is--transition': index !== indexActive }">
+        <NuxtLink v-if="index === indexActive" class="link-target" :to="slide.HorizontalScrollSlideLink" @click="cursorDiscover = false" />
+      </div>
+    </div> -->
+
     <div class="bg">
       <div class="overlay-black"></div>
       <div v-for="(item, index) in slides" :key="index" class="image" :class="['image-' + index]">
@@ -57,7 +70,7 @@
 <script setup lang="ts">
 import gsap from 'gsap';
 import ScrollTrigger from 'gsap/ScrollTrigger';
-import { HorizontalScrollSection } from '~/types/cms';
+import { HorizontalScrollSection } from '~/types/common';
 
 if (import.meta.client) {
   gsap.registerPlugin(ScrollTrigger);
@@ -72,12 +85,18 @@ const slides = computed(() => props.data.HorizontalScrollSlide);
 const el = ref();
 const indexActive = ref(0);
 
+const cursorDiscover = useCursorDiscover();
+
 const currentIndexText = computed(() => {
   return indexActive.value + 1;
 });
 
 const totalIndexText = computed(() => {
   return slides.value.length;
+});
+
+const isHaveLinks = computed(() => {
+  return slides.value.some((slide) => slide.HorizontalScrollSlideLink);
 });
 
 const numberPad = (number: number) => {
@@ -275,13 +294,18 @@ onMounted(() => {
         );
       } else {
         tl.to(`.innovation .bg .image-${index}`, {
-          autoAlpha: 1,
-        });
-
-        tl.to(`.innovation .image-center-${index}`, {
           '--mask': 'inset(0% 0% 0% 0%)',
           duration: totalDuration,
         });
+
+        tl.to(
+          `.innovation .image-center-${index}`,
+          {
+            '--mask': 'inset(0% 0% 0% 0%)',
+            duration: totalDuration,
+          },
+          '-=100%',
+        );
       }
 
       tl.to(
@@ -332,6 +356,35 @@ onUnmounted(() => {
   max-height: 100vh;
   position: relative;
   overflow: hidden;
+
+  &.is--links {
+    cursor: pointer;
+  }
+
+  .link-wrapper {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .link-inner,
+    .link-target {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+    }
+
+    .link-target {
+      display: block;
+      pointer-events: inherit;
+    }
+  }
 
   .image {
     --mask-gradient: linear-gradient(
@@ -407,10 +460,10 @@ onUnmounted(() => {
     will-change: mask-image;
 
     @include mx.mobile {
+      --mask: inset(100% 0 0 0);
+      clip-path: var(--mask);
       mask-image: none;
-      will-change: auto;
-      opacity: 0;
-      visibility: hidden;
+      will-change: clip-path;
     }
 
     &.image-0 {
@@ -479,10 +532,8 @@ onUnmounted(() => {
       );
 
       @include mx.mobile {
+        --mask: inset(0 0 0 0);
         mask-image: none;
-        will-change: auto;
-        opacity: 1;
-        visibility: visible;
       }
     }
   }
@@ -508,6 +559,7 @@ onUnmounted(() => {
     inset: 0;
     will-change: transform;
     transform: scale(1.15);
+    pointer-events: none;
 
     .overlay-black {
       opacity: 0.25;
@@ -526,6 +578,7 @@ onUnmounted(() => {
 
   .label-mobile {
     display: none;
+    pointer-events: none;
 
     @include mx.mobile {
       display: block;
@@ -560,6 +613,7 @@ onUnmounted(() => {
     transform: translate(-50%, -50%);
     z-index: 2;
     padding: 0 fn.toVw(var.$container);
+    pointer-events: none;
 
     @include mx.mobile {
       display: none;
@@ -620,6 +674,11 @@ onUnmounted(() => {
         max-width: fn.toVw(178);
       }
 
+      @media (min-aspect-ratio: 16/9) and (max-height: 870px) {
+        margin-top: 10%;
+        margin-bottom: 10%;
+      }
+
       .title {
         position: absolute;
         inset: 0;
@@ -637,6 +696,10 @@ onUnmounted(() => {
 
       @include mx.mobile {
         height: fn.toVw(180);
+      }
+
+      @media (min-aspect-ratio: 16/9) and (max-height: 870px) {
+        height: 35%;
       }
 
       .image-inner {

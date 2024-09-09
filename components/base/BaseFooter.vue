@@ -6,14 +6,15 @@
 
         <div class="contact d-desktop">
           <div class="contact-item">
-            <p>Email Address :</p>
-            <a class="link" href="mailto:info@elementis.co">info@elementis.co</a>
-          </div>
-
-          <div class="contact-item">
-            <p>Phone :</p>
+            <p>CONTACT US :</p>
+            <a class="link" href="mailto:info@elementis.co">info@ELEMENTIS.co</a>
             <a class="link" href="tel:+62 823 4078 1817">+62 823 4078 1817</a>
           </div>
+
+          <!-- <div class="contact-item">
+            <p>Phone :</p>
+            <a class="link" href="tel:+62 823 4078 1817">+62 823 4078 1817</a>
+          </div> -->
         </div>
       </div>
 
@@ -31,26 +32,37 @@
 
       <div class="contact d-mobile">
         <div class="contact-item">
-          <p>Email Address :</p>
-          <a class="link" href="mailto:info@elementis.co">info@elementis.co</a>
-        </div>
-
-        <div class="contact-item">
-          <p>Phone :</p>
+          <p>CONTACT US :</p>
+          <a class="link" href="mailto:info@elementis.co">info@ELEMENTIS.co</a> <span class="spacer"> | </span>
           <a class="link" href="tel:+62 823 4078 1817">+62 823 4078 1817</a>
         </div>
+
+        <!-- <div class="contact-item">
+          <p>Phone :</p>
+          <a class="link" href="tel:+62 823 4078 1817">+62 823 4078 1817</a>
+        </div> -->
       </div>
 
       <div class="social font-button3">
-        <p>Social Media :</p>
+        <p>Stay Connected :</p>
 
         <ul class="socmed-list">
           <li>
-            <NuxtLink to="/" target="_blank" external>
+            <NuxtLink to="https://www.instagram.com/elementis.co/" target="_blank" external>
               <IconInstagram />
             </NuxtLink>
           </li>
           <li>
+            <NuxtLink to="https://www.facebook.com/share/Qfswyjm8Uz44otYs/?mibextid=LQQJ4d" target="_blank" external>
+              <IconFacebook />
+            </NuxtLink>
+          </li>
+          <li>
+            <NuxtLink to="https://wa.me/6282340781817" target="_blank" external>
+              <IconWhatsapp />
+            </NuxtLink>
+          </li>
+          <!-- <li>
             <NuxtLink to="/" target="_blank" external>
               <IconPinterest />
             </NuxtLink>
@@ -69,7 +81,7 @@
             <NuxtLink to="/" target="_blank" external>
               <IconLinkedin />
             </NuxtLink>
-          </li>
+          </li> -->
         </ul>
       </div>
     </div>
@@ -79,6 +91,14 @@
     <div class="container bottom font-body3">
       <div class="border"></div>
 
+      <div class="copyright">
+        <p>© {{ new Date().getFullYear() }} ELEMENTIS. All Rights Reserved</p>
+      </div>
+
+      <div class="terms">
+        <NuxtLink class="link" active-class="active" to="/privacy-terms">Policies and Terms</NuxtLink>
+      </div>
+
       <div class="credit">
         <p>
           Website by
@@ -87,36 +107,12 @@
           </NuxtLink>
         </p>
       </div>
-
-      <div class="copyright">
-        <p>© {{ new Date().getFullYear() }} ELEMENTIS. All Rights Reserved</p>
-      </div>
-
-      <!-- Phase 2 -->
-      <!-- <div class="terms">
-        <NuxtLink class="link" to="/">Terms & Conditions</NuxtLink> <span class="spacer">|</span>
-        <NuxtLink class="link" to="/">Privacy Policy</NuxtLink>
-      </div> -->
-
-      <div class="scroll" @click="scrollToTop()">
-        <p>Scroll to top</p>
-        <IconArrow />
-      </div>
     </div>
   </footer>
 </template>
 
 <script setup>
 import menuItems from '~/data/menu.json';
-
-const lenis = useNuxtApp().$lenis;
-
-const scrollToTop = () => {
-  lenis.lenis.scrollTo(0, {
-    duration: 1,
-    force: true,
-  });
-};
 </script>
 
 <style scoped lang="scss">
@@ -176,11 +172,11 @@ const scrollToTop = () => {
     .contact-item {
       &:nth-child(1) {
         @include mx.mobile {
-          grid-column: 1/3;
+          grid-column: 1/-1;
         }
       }
 
-      &:nth-child(2) {
+      /* &:nth-child(2) {
         @include mx.mobile {
           grid-column: 3/-1;
         }
@@ -192,20 +188,33 @@ const scrollToTop = () => {
         @include mx.mobile {
           margin-bottom: 0;
         }
-      }
+      } */
 
       p {
         color: var.$color-text;
-        opacity: 0.5;
+        /* opacity: 0.5; */
 
         @include mx.mobile {
-          font-size: fn.toVw(14);
+          font-size: fn.toVw(16);
         }
       }
 
       a {
         display: block;
         margin-top: fn.toVw(16);
+
+        @include mx.mobile {
+          display: inline-block;
+        }
+
+        &:first-of-type {
+          margin-top: fn.toVw(24);
+        }
+      }
+
+      .spacer {
+        margin-left: fn.toVw(20);
+        margin-right: fn.toVw(20);
       }
     }
   }
@@ -247,14 +256,13 @@ const scrollToTop = () => {
 
     p {
       @include mx.mobile {
-        font-size: fn.toVw(14);
-        opacity: 0.5;
+        font-size: fn.toVw(16);
       }
     }
 
     .socmed-list {
       display: flex;
-      gap: fn.toVw(48);
+      gap: fn.toVw(40);
       margin-top: fn.toVw(48);
 
       @include mx.mobile {
@@ -263,6 +271,8 @@ const scrollToTop = () => {
       }
 
       svg {
+        width: auto;
+        height: 100%;
         max-width: fn.toVw(28);
         max-height: fn.toVw(28);
 
@@ -310,63 +320,29 @@ const scrollToTop = () => {
     }
 
     .credit {
-      grid-column: 1/3;
+      grid-column: 11/-1;
+      justify-self: flex-end;
+      display: flex;
+      align-items: center;
 
       @include mx.mobile {
-        order: 2;
+        justify-self: flex-start;
+      }
+
+      @include mx.mobile {
         grid-column: 1/-1;
       }
     }
 
     .copyright {
-      grid-column: 6/10;
+      grid-column: 1/4;
 
       @include mx.mobile {
-        order: 1;
         grid-column: 1/-1;
       }
     }
 
-    .scroll {
-      grid-column: 11/-1;
-      justify-self: flex-end;
-      display: flex;
-      align-items: center;
-      gap: fn.toVw(16);
-      cursor: pointer;
-
-      @include mx.mobile {
-        order: 3;
-        justify-self: flex-start;
-        gap: fn.toVw(12);
-        grid-column: 1/-1;
-      }
-
-      &:hover {
-        &:deep(svg) {
-          transform: translateY(-3px) rotate(180deg);
-        }
-      }
-
-      &:deep(svg) {
-        width: fn.toVw(12);
-        height: auto;
-        transform: rotate(180deg);
-        will-change: transform;
-        transition: transform 0.3s var.$transition-ease;
-
-        @include mx.mobile {
-          width: fn.toVw(10);
-        }
-
-        path {
-          fill: var.$color-text;
-        }
-      }
-    }
-
-    /* Phase 2 */
-    /* .terms {
+    .terms {
       grid-column: 6/10;
 
       @include mx.mobile {
@@ -377,7 +353,7 @@ const scrollToTop = () => {
         margin-left: 0.5em;
         margin-right: 0.8em;
       }
-    } */
+    }
   }
 }
 </style>

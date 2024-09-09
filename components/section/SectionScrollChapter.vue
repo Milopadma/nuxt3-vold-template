@@ -1,5 +1,5 @@
 <template>
-  <section ref="el" class="scroll-chapter">
+  <section id="glass-solutions" ref="el" class="scroll-chapter">
     <div v-for="(item, index) in props.data.List" :key="index" class="items" :class="['items-' + index]">
       <div class="overlay-black"></div>
 
@@ -38,14 +38,14 @@
 import gsap from 'gsap';
 import ScrollTrigger from 'gsap/ScrollTrigger';
 
-import type { ScrollChapter } from '~/types/cms';
+import type { ScrollChapterSection } from '~/types/common';
 
 if (import.meta.client) {
   gsap.registerPlugin(ScrollTrigger);
 }
 
 const props = defineProps<{
-  data: ScrollChapter;
+  data: ScrollChapterSection;
 }>();
 
 const el = ref();
@@ -80,6 +80,7 @@ const headerOut = () => {
     start: 'top top',
     end: `+=${totalIndexText.value * 100 * 1.5}%`,
     invalidateOnRefresh: true,
+    refreshPriority: 1,
     onEnter: () => {
       hideHeader();
     },

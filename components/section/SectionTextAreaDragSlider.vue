@@ -1,5 +1,5 @@
 <template>
-  <section ref="el" class="section-slider">
+  <section id="state-of-art" ref="el" class="section-slider">
     <TextMarquee v-if="props.data.TextAreaDragSliderSubtitle && !textDescription" class="marquee" :text="props.data.TextAreaDragSliderSubtitle" />
 
     <div class="container">
@@ -17,7 +17,13 @@
         </div>
 
         <div class="slider">
-          <div ref="elDrag" class="slider-wrapper" @mouseenter="cursorDrag = true" @mouseleave="cursorDrag = false">
+          <div
+            ref="elDrag"
+            class="slider-wrapper"
+            @mouseenter="cursorDrag = true"
+            @mouseleave="cursorDrag = false"
+            @mousedown="cursorClicked = true"
+            @mouseup="cursorClicked = false">
             <CardSlide
               v-for="(item, index) in props.data.TextAreaDragSliderSlide"
               :key="index"
@@ -42,7 +48,7 @@ import ScrollTrigger from 'gsap/ScrollTrigger';
 import Draggable from 'gsap/Draggable';
 import InertiaPlugin from 'gsap/InertiaPlugin';
 
-import type { TextAreaDragSliderSection } from '~/types/cms';
+import type { TextAreaDragSliderSection } from '~/types/common';
 
 if (import.meta.client) {
   gsap.registerPlugin(ScrollTrigger, Draggable, InertiaPlugin);
@@ -57,6 +63,7 @@ const elDrag = ref<HTMLElement>();
 const elProgressFill = ref<HTMLElement | null>(null);
 
 const cursorDrag = useCursorDrag();
+const cursorClicked = useCursorClicked();
 
 const textDescription = useHighlightedText(() => props.data.TextAreaDragSliderDescription, { spacer: '&nbsp;' });
 
@@ -102,6 +109,9 @@ onMounted(() => {
           overwrite: 'auto',
         });
       },
+      onDragEnd: function () {
+        cursorClicked.value = false;
+      },
     });
   }, el.value);
 });
@@ -116,6 +126,8 @@ onUnmounted(() => {
   padding-top: fn.toVw(200);
   padding-bottom: fn.toVw(163);
   background-color: var.$color-secondary;
+  width: 100%;
+  overflow: hidden;
 
   @include mx.mobile {
     padding-top: fn.toVw(120);

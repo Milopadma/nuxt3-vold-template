@@ -1,5 +1,5 @@
 <template>
-  <section class="hero">
+  <section ref="el" class="hero">
     <div class="overlay-gradient top"></div>
     <div class="overlay-gradient bottom"></div>
 
@@ -19,7 +19,9 @@
     </div>
 
     <div class="text-title">
-      <TextMarquee :text="marqueeText" :scroll-speed="8" />
+      <div ref="elTitleInner" class="text-title-inner">
+        <TextMarquee :text="marqueeText" :scroll-speed="8" />
+      </div>
     </div>
 
     <div class="text-bottom">
@@ -36,6 +38,9 @@
 </template>
 
 <script setup lang="ts">
+import gsap from 'gsap';
+
+const el = ref<HTMLElement>();
 const elImg = ref<HTMLElement | null>(null);
 
 if (useDevice().isDesktop) {
@@ -45,13 +50,91 @@ if (useDevice().isDesktop) {
 }
 
 import { computed } from 'vue';
-import type { HeroSection } from '~/types/cms';
+import { HeroSection } from '~/types/common';
 
 const props = defineProps<{
   data: HeroSection;
 }>();
 
 const marqueeText = computed(() => props.data['elementis-hero-marquee-text']);
+
+const elTitleInner = ref<HTMLElement | null>(null);
+const isPreloadDone = useIsPreloadDone();
+
+let ctx: gsap.Context;
+
+onMounted(() => {
+  ctx = gsap.context(() => {
+    const tlImage = gsap.timeline({
+      paused: isPreloadDone.value ? false : true,
+      defaults: {
+        ease: 'circ.out',
+        duration: 1.8,
+      },
+    });
+
+    tlImage.from('.image img', {
+      scale: 1.2,
+    });
+
+    watch(isPreloadDone, (value) => {
+      if (value) {
+        tlImage.play();
+      }
+    });
+
+    if (isPreloadDone.value) return;
+
+    const tlText = gsap.timeline({
+      paused: true,
+    });
+
+    tlText.from('.overlay-gradient', {
+      opacity: 0,
+      ease: 'power1.out',
+      duration: 1,
+    });
+
+    tlText.from(
+      elTitleInner.value,
+      {
+        yPercent: 101,
+      },
+      '<=20%',
+    );
+
+    tlText.from(
+      '.border',
+      {
+        scaleX: 0,
+        transformOrigin: 'left',
+        duration: 1,
+      },
+      '<=20%',
+    );
+
+    tlText.from(
+      '.text-bottom-wrapper > *',
+      {
+        y: 80,
+        ease: 'expo.out',
+        duration: 1.4,
+        stagger: 0.15,
+      },
+      '<=20%',
+    );
+
+    watch(isPreloadDone, (value) => {
+      if (value) {
+        tlText.play();
+      }
+    });
+  }, el.value);
+});
+
+onUnmounted(() => {
+  ctx && ctx.revert();
+});
 </script>
 
 <style scoped lang="scss">
@@ -118,6 +201,7 @@ const marqueeText = computed(() => props.data['elementis-hero-marquee-text']);
     bottom: fn.toVw(126);
     left: 0;
     z-index: 2;
+    overflow: hidden;
 
     @include mx.mobile {
       bottom: fn.toVw(96);

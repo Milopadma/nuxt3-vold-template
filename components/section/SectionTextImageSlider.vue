@@ -62,7 +62,7 @@
 import gsap from 'gsap';
 import ScrollTrigger from 'gsap/ScrollTrigger';
 
-import type { TextImageSliderSection } from '~/types/cms';
+import type { TextImageSliderSection } from '~/types/common';
 
 if (import.meta.client) {
   gsap.registerPlugin(ScrollTrigger);
@@ -245,6 +245,48 @@ onMounted(() => {
   const gradientDuration = 0.1;
 
   ctx = gsap.context(() => {
+    if (el.value.offsetHeight >= window.innerHeight) {
+      const header = document.getElementById('header');
+
+      const hideHeader = () => {
+        gsap.to(header, {
+          autoAlpha: 0,
+          duration: 0.3,
+          ease: 'none',
+        });
+      };
+
+      const showHeader = () => {
+        gsap.to(header, {
+          autoAlpha: 1,
+          duration: 0.3,
+          ease: 'none',
+        });
+      };
+
+      ScrollTrigger.create({
+        trigger: el.value,
+        start: 'center center',
+        end: '+=20%',
+        endTrigger: '.innovation',
+        refreshPriority: 1,
+        invalidateOnRefresh: true,
+        pin: true,
+        onEnter: () => {
+          hideHeader();
+        },
+        onEnterBack: () => {
+          hideHeader();
+        },
+        onLeaveBack: () => {
+          showHeader();
+        },
+        onLeave: () => {
+          showHeader();
+        },
+      });
+    }
+
     watch(indexActive, (value) => {
       const totalSlides = props.data.elementisTextImageSlide.length;
       const distance = (value - lastIndex + totalSlides) % totalSlides;
@@ -457,6 +499,7 @@ onUnmounted(() => {
 <style scoped lang="scss">
 .wellness-slideshow {
   background-color: var.$color-secondary;
+  max-height: 100vh;
 
   --basesvh: 812;
 

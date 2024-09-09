@@ -1,30 +1,28 @@
 <script setup lang="ts">
 import { useSeoMeta } from '#imports';
 import SectionsWrapper from '~/components/shared/SectionsWrapper.vue';
-import type { PageData } from '~/types/common';
+import type { PageData } from '~/types/page';
 
 const { $utils, $crud } = useNuxtApp();
 await $utils.getWebConfig();
 const route = useRoute();
 
 // Fetch page data
-const pageData = (await $crud.GET_SINGLE(route.params.page as string)) as PageData | null;
+const pageData = (await $crud.getPage(route.params.page as string)) as PageData | null;
 
 // Set SEO meta
-useSeoMeta($utils.headerMeta());
+const meta = $utils.headerMeta(pageData);
+useSeoMeta(meta);
 
-// Check if it's a valid slug
-const validSlug = pageData?.results?.some((page) => page.customUrl.en === route.params.page);
-
-if (!validSlug) {
+if (!pageData) {
   throw createError({ statusCode: 404, statusMessage: 'Page Not Found' });
 }
 
 // Filter and prepare components for the current page
 const pageComponents = computed(() => {
-  if (!pageData?.results) return [];
-  const currentPage = pageData.results.find((page) => page.customUrl.en === route.params.page);
-  return currentPage?.components || [];
+  if (!pageData) return [];
+  // @ts-ignore
+  return pageData.components || [];
 });
 </script>
 

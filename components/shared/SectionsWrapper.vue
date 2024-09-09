@@ -5,6 +5,7 @@ import type { ComponentData } from '~/types/common';
 
 const props = defineProps<{
   components: {
+    hide?: boolean;
     id: string;
     section: string;
     sectionId: string;
@@ -33,6 +34,7 @@ const dynamicComponents = computed(() =>
   props.components.map((comp) => ({
     component: createComponent(comp.sectionId),
     props: {
+      hide: comp.hide,
       data: comp.data,
       sectionId: comp.sectionId,
     },
@@ -43,7 +45,7 @@ const dynamicComponents = computed(() =>
 <template>
   <div class="main-wrapper">
     <template v-for="(comp, index) in dynamicComponents" :key="index">
-      <component :is="comp.component" v-bind="comp.props" />
+      <component :is="comp.component" v-bind="comp.props" v-if="!comp.props.hide" />
     </template>
   </div>
 </template>

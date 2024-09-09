@@ -18,8 +18,13 @@
 
             <div class="title font-subheading3">{{ item.MarqueeAccordionSlideTitle }}</div>
 
-            <div class="icon">
-              <IconArrow />
+            <div class="icon-wrapper">
+              <div class="icon icon-up">
+                <IconArrow />
+              </div>
+              <div class="icon icon-down">
+                <IconArrow />
+              </div>
             </div>
           </div>
 
@@ -96,6 +101,15 @@ onMounted(() => {
             ScrollTrigger.refresh();
           },
         });
+
+        gsap.to(content, {
+          height: isOpen ? 0 : 'auto',
+          duration: 1,
+          overwrite: true,
+          onComplete: () => {
+            ScrollTrigger.refresh();
+          },
+        });
       });
     });
   });
@@ -134,9 +148,17 @@ onUnmounted(() => {
     position: relative;
 
     &.active {
-      .icon {
-        &:deep(svg) {
-          transform: rotate(180deg);
+      .head {
+        .icon-wrapper {
+          .icon {
+            &.icon-up {
+              transform: rotate(180deg) translateY(0%);
+            }
+
+            &.icon-down {
+              transform: translateY(120%);
+            }
+          }
         }
       }
 
@@ -216,16 +238,47 @@ onUnmounted(() => {
         }
       }
 
-      .icon {
-        &:deep(svg) {
+      .icon-wrapper {
+        overflow: hidden;
+        width: fn.toVw(18);
+        height: fn.toVw(18);
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        @include mx.mobile {
           width: fn.toVw(14);
-          flex-shrink: 0;
-          height: auto;
-          will-change: transform;
+          height: fn.toVw(14);
+        }
+
+        .icon {
+          position: absolute;
+          inset: 0;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          transform-origin: center;
           transition: transform 0.5s var.$transition-ease;
 
+          &.icon-up {
+            transform: rotate(180deg) translateY(120%);
+          }
+
+          &.icon-down {
+            transform: translateY(0%);
+          }
+        }
+
+        &:deep(svg) {
+          width: fn.toVw(14);
+          height: fn.toVw(14);
+          flex-shrink: 0;
+          height: auto;
+
           @include mx.mobile {
-            width: fn.toVw(9);
+            width: fn.toVw(12);
+            height: fn.toVw(12);
           }
 
           path {

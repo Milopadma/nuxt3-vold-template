@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { DescriptionImageDetailSection } from '~/types/cms';
+import { DescriptionImageDetailSection } from '~/types/common';
 
 const props = defineProps<{
   data: DescriptionImageDetailSection;
@@ -31,9 +31,7 @@ if (useDevice().isDesktop) {
       <div ref="elImg" class="detail-image">
         <NuxtPicture :src="getImage(props.data.SectionDescriptionImageDetailImage)" :img-attrs="{ alt: 'Detail Image' }" />
       </div>
-      <div class="detail-description">
-        <p>{{ props.data.SectionDescriptionImageDetaiImageDetail }}</p>
-      </div>
+      <div class="detail-description" v-html="props.data.SectionDescriptionImageDetaiImageDetail"></div>
     </div>
   </section>
 </template>

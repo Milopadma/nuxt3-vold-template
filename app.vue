@@ -1,25 +1,34 @@
 <script setup>
+import gsap from 'gsap';
+import ScrollTrigger from 'gsap/ScrollTrigger';
 import mobilebar from './utils/mobilebar';
+
+if (import.meta.client) {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 const tlTransition = useTlTransition();
 const isTransition = useIsTransition();
 const elPageTransition = ref();
+const isHeaderHidden = useHeaderHidden();
 
 onMounted(() => {
   configDefault();
   resize();
   mobilebar();
+
+  ScrollTrigger.refresh();
 });
 
 useHead({
-  titleTemplate: `%s ― create-vold-app`,
+  titleTemplate: `%s ― Elementis`,
 });
 
 useSeoMeta({
-  title: 'create-vold-app',
-  ogTitle: 'create-vold-app',
-  description: 'Vold app project',
-  ogDescription: 'Vold app project',
+  title: 'Elementis',
+  ogTitle: 'Elementis',
+  description: 'A lifestyle revolution for a sustainable fulfilling future',
+  ogDescription: 'A lifestyle revolution for a sustainable fulfilling future',
   ogImage: '/hero.jpg',
   twitterCard: 'summary_large_image',
 });
@@ -30,10 +39,18 @@ const pageTransition = {
   onEnter: (el, done) => {
     setTimeout(() => {
       tlTransition.value.reverse();
+
+      // TODO: improve later
+      ScrollTrigger.refresh();
     }, 200);
 
     done();
     isTransition.value = false;
+
+    setTimeout(() => {
+      if (!isHeaderHidden.value) return;
+      isHeaderHidden.value = false;
+    }, 300);
   },
   onLeave: (el, done) => {
     isTransition.value = true;
@@ -59,6 +76,10 @@ const pageTransition = {
       <DebugBorders />
 
       <BaseCursor />
+
+      <BasePreloader />
+
+      <PopupCookies />
 
       <!-- Layout -->
       <NuxtLayout :class="{ 'is--transition': isTransition }">

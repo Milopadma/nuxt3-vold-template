@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { BigImageSection } from '~/types/cms';
+import { BigImageSection } from '~/types/common';
 
 const props = defineProps<{
   data: BigImageSection;
@@ -27,9 +27,13 @@ if (useDevice().isDesktop) {
 <style scoped lang="scss">
 .big-image-section {
   position: relative;
-  height: 100vh;
+  height: fn.toVw(840);
   width: 100vw;
   overflow: hidden;
+
+  @include mx.mobile {
+    height: fn.toVw(656);
+  }
 }
 
 .big-image {

@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import { useNuxtApp, useRoute, defineNuxtPlugin, useRuntimeConfig } from '#app';
 import { usePageDetail, usePageSections, useWebConfig, useNavigations } from '../composables/states';
+import { PageResult } from '~/types/page';
 
 export default defineNuxtPlugin({
   name: 'utils',
@@ -54,7 +55,7 @@ export default defineNuxtPlugin({
     const getWebConfig = async () => {
       const webConfig = useWebConfig();
       const { $crud } = useNuxtApp();
-      webConfig.value = await $crud.GET_WEBCONFIG();
+      webConfig.value = await $crud.getWebconfig();
     };
 
     const getPageDetail = async () => {
@@ -68,14 +69,16 @@ export default defineNuxtPlugin({
       let getDetail = null;
 
       if (name === 'index') {
-        getDetail = await $crud.HOMEPAGE();
+        getDetail = await $crud.getHomepage();
       } else if (name === 'post-slug') {
-        getDetail = await $crud.GET_SINGLE(params.slug as string);
+        getDetail = await $crud.getSinglePost(params.slug as string);
       } else {
-        getDetail = await $crud.GET_SINGLE(params.page as string);
+        getDetail = await $crud.getPage(params.page as string);
       }
 
+      // @ts-ignore
       section.value = getDetail?.components;
+      // @ts-ignore
       pageDetail.value = getDetail;
 
       return getDetail;
@@ -89,31 +92,30 @@ export default defineNuxtPlugin({
       return '';
     };
 
-    const headerMeta = () => {
-      const pageDetail = usePageDetail();
-      const metaDetail = pageDetail.value?.meta;
+    const headerMeta = (pageResult: PageResult): Record<string, any> => {
+      const metaDetail = pageResult?.meta;
       const { name } = useRoute();
       if (name === 'thank-you')
         return {
           title: 'Thank you!',
         };
 
-      if (!pageDetail)
+      if (!pageResult)
         return {
           title: 'Not found!',
         };
 
-      let title = translate(pageDetail.value?.title);
-      const metaTitle = _.get(pageDetail.value, 'meta.title', '');
-      const metaDescription = _.get(pageDetail.value, 'meta.description', '');
-      const description = translate(metaDescription);
-      const keyword = translate(_.get(pageDetail.value, 'meta.keyword', ''));
+      let title = translate(pageResult?.title ?? pageResult?.data?.title);
+      const metaTitle = _.get(metaDetail, 'title.en', '');
+      const metaDescription = _.get(metaDetail, 'description.en', '');
+      const description = metaDescription;
+      const keyword = translate(_.get(pageResult, 'meta.keyword', ''));
       const faviconImage = _.get({}, 'data.favicon', '');
-      const noIndex = _.get(pageDetail.value, 'data.noindex', false);
+      const noIndex = _.get(pageResult, 'data.noindex', false);
       let favicon = '';
       if (faviconImage) favicon = renderImagePath(faviconImage);
 
-      if (metaTitle) title = translate(metaTitle);
+      if (metaTitle) title = metaTitle;
 
       const meta: Record<string, any> = {
         favicon,
@@ -130,7 +132,7 @@ export default defineNuxtPlugin({
           meta.description = description;
           meta.ogDescription = description;
         }
-        if (metaDetail?.image) meta.ogImage = renderImagePath(metaDetail?.image);
+        if (metaDetail?.image) meta.ogImage = renderImagePath(metaDetail.image);
       }
 
       if (noIndex) meta.robot = 'noindex, nofollow';

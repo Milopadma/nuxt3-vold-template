@@ -10,16 +10,16 @@
         <BaseError
           v-if="props?.error?.statusCode === 500"
           title="Internal Server Error"
-          message="Internal Server Error. Something went wrong, Please try again later" />
+          message="Oops! Something Went Wrong, Please try again later" />
 
         <!-- 404 -->
-        <BaseError v-if="props?.error?.statusCode === 404" title="Page Not Found" message="This page does not exist." />
+        <BaseError v-if="props?.error?.statusCode === 404" title="Page Not Found" message="Oops! Something Went Wrong, Please try again later" />
 
         <!-- 400 -->
-        <BaseError v-if="props?.error?.statusCode === 400" title="Bad Request" message="Bad Request." />
+        <BaseError v-if="props?.error?.statusCode === 400" title="Bad Request" message="Oops! Something Went Wrong, Please try again later" />
 
         <div class="cta">
-          <Button label="Go To Homepage" @click="handleError" />
+          <a class="link" href="/">Go To Homepage</a>
         </div>
       </section>
     </div>
@@ -30,8 +30,6 @@
 const props = defineProps({
   error: Object,
 });
-
-const handleError = () => clearError({ redirect: '/' });
 
 useSeoMeta({
   title: props?.error?.statusMessage,

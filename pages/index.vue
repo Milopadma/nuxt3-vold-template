@@ -1,7 +1,7 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import { useSeoMeta } from '#imports';
 import SectionsWrapper from '~/components/shared/SectionsWrapper.vue';
-import type { HomePageData } from '~/types/common';
+import type { HomePageData } from '~/types/homepage';
 
 const { $utils, $crud } = useNuxtApp();
 await $utils.getWebConfig();
@@ -10,7 +10,12 @@ await $utils.getWebConfig();
 const pageData = (await $utils.getPageDetail()) as HomePageData | null;
 
 // Set SEO meta
-useSeoMeta($utils.headerMeta());
+useHead({
+  titleTemplate: `%s`,
+});
+
+const meta = $utils.headerMeta(pageData);
+useSeoMeta(meta);
 
 // Filter and prepare components for the home page
 const pageComponents = computed(() => {

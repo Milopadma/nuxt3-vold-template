@@ -82,6 +82,12 @@ const setCountryBasedOnLocale = () => {
   }
 };
 
+const resetValue = () => {
+  modelInput.value = '';
+  setCountryBasedOnLocale();
+};
+defineExpose({ resetValue });
+
 onMounted(() => {
   setCountryBasedOnLocale();
 

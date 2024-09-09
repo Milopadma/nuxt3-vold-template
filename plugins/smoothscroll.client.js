@@ -20,20 +20,10 @@ export default defineNuxtPlugin((nuxtApp) => {
     touchMultiplier: 2,
   });
 
-  const header = document.getElementById('header');
+  lenis.stop();
+  document.documentElement.style.setProperty('overflow', 'hidden');
 
-  lenis.on('scroll', (e) => {
-    ScrollTrigger.update();
-
-    if (e.isStopped) return;
-    if (e.direction === 1) {
-      // Scroll up
-      header.classList.add('is--hidden');
-    } else if (e.direction === -1) {
-      // Scroll down
-      header.classList.remove('is--hidden');
-    }
-  });
+  lenis.on('scroll', ScrollTrigger.update);
 
   gsap.ticker.add((time) => {
     lenis.raf(time * 1000);

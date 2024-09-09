@@ -1,5 +1,5 @@
 <template>
-  <section class="form-section">
+  <section id="joinus" class="form-section">
     <div class="col form-image">
       <div ref="elImg" class="form-image-img">
         <NuxtPicture class="image" src="/form.jpg" :img-attrs="{ alt: 'Form' }" />
@@ -8,7 +8,7 @@
     <div class="col form-content">
       <h2 class="font-subheading1">Take the First Step</h2>
       <p class="desc font-body2">
-        Become a member of ELEMENTIS Club and take the first step towards a life filled with purpose, wellness, and connection.
+        Become a member of ELEMENTIS Club and take the first step towards a life filled with purpose, Wellness, and connection.
       </p>
 
       <form class="form" @submit.prevent="submitForm">
@@ -16,22 +16,34 @@
 
         <FormInput v-model="formData.email" name="email" label="Email Address" type="email" placeholder="Enter your email address" />
 
-        <FormPhoneNumber v-model="formData.phone" :items="countryList" name="phone" label="Phone Number" placeholder="Enter your phone number" />
+        <FormPhoneNumber
+          ref="inputPhone"
+          v-model="formData.phone"
+          :items="countryList"
+          name="phone"
+          label="Phone Number"
+          placeholder="Enter your phone number" />
 
         <FormSelect v-model="formData.country" :items="countryList" name="country" label="Country" placeholder="Select your country" />
 
         <div class="category">
-          <p class="category-title">I'd like to receive information on ELEMENTIS.</p>
+          <p class="category-title">I would like to receive information on ELEMENTIS.</p>
 
           <div class="category-group">
             <FormCheckbox v-for="item in formData.category" :key="item.name" v-model="item.value" :name="item.name" :label="item.label" />
           </div>
         </div>
 
-        <button class="form-button font-button2" type="submit">
-          <span>Sign up</span>
+        <div class="agree">
+          <FormCheckbox v-model="isAgree" name="agree" label="I agree to the" :required="true" :policy="true" />
+        </div>
+
+        <button class="form-button font-button2" type="submit" :disabled="loading">
+          <span>{{ loading ? 'Please Wait' : 'Sign Up' }}</span>
           <span class="icon-wrapper"><IconArrowUpRight class="icon" /></span>
         </button>
+
+        <p v-if="!loading && message" style="margin-top: 1rem">{{ message }}</p>
       </form>
     </div>
   </section>
@@ -40,7 +52,11 @@
 <script setup lang="ts">
 import countryList from '~/data/country.json';
 
-const formData = reactive({
+const { executeRecaptcha } = useGoogleRecaptcha();
+
+const isAgree = ref(false);
+
+const formState = {
   fullname: '',
   email: '',
   phone: '',
@@ -72,10 +88,50 @@ const formData = reactive({
       value: false,
     },
   ],
-});
+};
+
+const formData = reactive({ ...formState });
+const inputPhone = ref();
+const message = ref<string | undefined>(undefined);
+const loading = ref<boolean>(false);
 
 const submitForm = async () => {
-  await console.log(formData);
+  if (!isAgree.value) {
+    message.value = 'Please agree to the policies and terms.';
+    return;
+  }
+
+  const captcha = await executeRecaptcha('submit');
+  if (!captcha.token) {
+    message.value = 'Please verify that you are not a robot.';
+    return;
+  }
+
+  loading.value = true;
+  const { data } = await useFetch('/forms', {
+    method: 'POST',
+    body: {
+      ...formData,
+      category: formData.category.filter((item) => item.value).map((item) => item.label),
+      token: captcha.token,
+    },
+  });
+  loading.value = false;
+
+  message.value = data.value?.message;
+  if (data.value?.isSuccess) {
+    resetValue();
+  }
+};
+
+const resetValue = () => {
+  Object.assign(formData, formState);
+  formData.category.forEach((item) => {
+    item.value = false;
+  });
+  inputPhone.value?.resetValue();
+  formData.country = getUserCountry();
+  isAgree.value = false;
 };
 
 const elImg = ref<HTMLElement | null>(null);
@@ -85,7 +141,7 @@ useParallax(elImg, {
 });
 
 onMounted(() => {
-  formData.country = countryList.filter((item) => item.code === getUserCountry())[0].name;
+  formData.country = getUserCountry();
 });
 </script>
 
@@ -162,11 +218,17 @@ onMounted(() => {
     max-width: fn.toVw(408);
 
     .category {
-      font-size: fn.toVw(15);
+      font-size: fn.toVw(16);
       margin-top: fn.toVw(40);
 
       .category-title {
         margin-bottom: fn.toVw(24);
+
+        @include mx.mobile {
+          margin-bottom: fn.toVw(20);
+          max-width: fn.toVw(300);
+          line-height: calc(20 / 16);
+        }
       }
 
       .category-group {
@@ -175,6 +237,14 @@ onMounted(() => {
         flex-wrap: wrap;
         gap: fn.toVw(16);
       }
+    }
+
+    .agree {
+      display: flex;
+      gap: fn.toVw(8);
+      align-items: center;
+      font-size: fn.toVw(16);
+      margin-top: fn.toVw(35);
     }
 
     .form-button {

@@ -1,19 +1,30 @@
 <template>
-  <NuxtLink :to="props.href" :external="props.external" :target="props.external ? '_blank' : ''" class="button-link font-button1">
-    <span class="text">{{ props.text }}</span>
-    <IconArrowUpRight class="icon" />
+  <template v-if="props.href">
+    <NuxtLink :to="props.href" :external="props.external" :target="props.external ? '_blank' : ''" class="button-link font-button1">
+      <span class="text">{{ props.text }}</span>
+      <IconArrowUpRight class="icon" />
 
-    <div class="border">
-      <div class="border-fill"></div>
+      <div class="border">
+        <div class="border-fill"></div>
+      </div>
+    </NuxtLink>
+  </template>
+  <template v-else>
+    <div class="button-link font-button1">
+      <span class="text">{{ props.text }}</span>
+      <IconArrowUpRight class="icon" />
+
+      <div class="border">
+        <div class="border-fill"></div>
+      </div>
     </div>
-  </NuxtLink>
+  </template>
 </template>
 
 <script setup>
 const props = defineProps({
   href: {
     type: String,
-    required: true,
   },
   text: {
     type: String,
